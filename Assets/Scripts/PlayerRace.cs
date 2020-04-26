@@ -1,0 +1,1 @@
+﻿public enum PlayerRace { HUMAN, ELF, DWARF, LIZARD };

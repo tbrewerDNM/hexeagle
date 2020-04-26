@@ -1,0 +1,1 @@
+﻿public enum UnitType {  INFANTRY, ARCHER, CAVALRY };

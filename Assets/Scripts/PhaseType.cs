@@ -1,0 +1,1 @@
+﻿public enum PhaseType { TOWN, OVERWORLD };
