@@ -9,6 +9,7 @@ Members: Steven Aque, Branden Baca, Terence Brewer, Wesley Camphouse
 <li>Click Start Game</li>
 <li>You can now begin playing against AI!</li>
 </ol>
+
 ### How to Play
 <ol>
 <li>Click on the help button to learn your way around the game</li>
@@ -19,6 +20,7 @@ Members: Steven Aque, Branden Baca, Terence Brewer, Wesley Camphouse
 <li>Click on trade to trade resources with other players</li>
 <li>Play until you have 300 gold to win!</li>
 </ol>
+
 ### Multiplayer
 <ol>
 <li>Multiplayer works with the heroku link, but it is very buggy</li>
