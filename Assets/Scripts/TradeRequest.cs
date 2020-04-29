@@ -20,18 +20,39 @@ public class TradeRequest
     {
         pid = pid2;
 
-        outResources = new int[4];
-        inResources = new int[4];
+        outResources = new int[4] { 0, 0, 0, 0};
+        inResources = new int[4] { 0, 0, 0, 0};
     }
 
     public void Reset()
     {
-        outResources = new int[4];
-        inResources = new int[4];
+        outResources = new int[4] { 0, 0, 0, 0};
+        inResources = new int[4] { 0, 0, 0, 0};
         accept1 = 0;
         accept2 = 0;
         turn = -1;
         isReset = true;
+    }
+
+    public bool empty()
+    {
+        foreach (int value in outResources)
+        {
+            if (value > 0)
+            {
+                return false;
+            }
+        }
+
+        foreach (int value in inResources)
+        {
+            if (value > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static void PrintMatrix(int[] m)

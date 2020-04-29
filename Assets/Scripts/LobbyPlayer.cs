@@ -11,6 +11,7 @@ public class LobbyPlayer : MonoBehaviour
     public Dropdown dropdown;
 
     // Needed for other players where dropdown disabled.
+    public Image raceBg;
     public Image raceImage;
     public Text raceText;
 

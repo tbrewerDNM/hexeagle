@@ -27,15 +27,24 @@ public class Lobby
 
         for (int i = 0; i < size; i++)
         {
-            if (i == PlayerWrapper.player.id)
-            {
-                lobbyPlayers.Add(PlayerWrapper.player);
-            }
-            else
+            if (MonoBehaviour.FindObjectOfType<LobbyManager>() == null)
             {
                 Player newPlayer = new Player(serial["player_" + i]);
                 newPlayer.id = i;
                 this.AddPlayer(newPlayer);
+            }
+            else
+            {
+                if (i == PlayerWrapper.player.id)
+                {
+                    lobbyPlayers.Add(PlayerWrapper.player);
+                }
+                else
+                {
+                    Player newPlayer = new Player(serial["player_" + i]);
+                    newPlayer.id = i;
+                    this.AddPlayer(newPlayer);
+                }
             }
         }
     }
@@ -43,14 +52,18 @@ public class Lobby
     public static Lobby FromString(SortedDictionary<string, string> serial) {
         Lobby newLobby = new Lobby(serial["SESSIONID"]);
 
+        MonoBehaviour.print(newLobby);
+
         newLobby.inGame = (serial["ingame"] == "1");
 
         newLobby.UpdateLobbyPlayers(serial);
 
+        MonoBehaviour.print(newLobby);
+
         return newLobby;
     }
 
-    private static string GenerateRandomString(int length)
+    public static string GenerateRandomString(int length)
     {
         string characters = "abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         string rs = "";

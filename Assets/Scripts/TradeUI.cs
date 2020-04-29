@@ -36,4 +36,12 @@ public class TradeUI : MonoBehaviour
             dropdowns[i].value = resources[i];
         }
     }
+
+    public void EnableAll(bool enable=true)
+    {
+        foreach (Dropdown dropdown in dropdowns)
+        {
+            dropdown.interactable = enable;
+        }
+    }
 }

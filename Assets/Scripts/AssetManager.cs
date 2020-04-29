@@ -10,6 +10,7 @@ public class AssetManager : MonoBehaviour
     public Sprite[] tradeImages;
     public Sprite[] buildingImages;
     public Sprite[] unitImages;
+    public Sprite[] colorBgs;
 
     // Start is called before the first frame update
     void Awake()

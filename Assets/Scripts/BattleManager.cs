@@ -39,7 +39,22 @@ public class BattleManager : MonoBehaviour
         {
             if (counter >= 240)
             {
-                StartCoroutine(NextRound());
+                if ((attackerQueue.Count == 0 && currentAttacker == null) && (defenderQueue.Count == 0 && currentDefender == null))
+                {
+                    StartCoroutine(EndBattle(3));
+                }
+                else if (attackerQueue.Count == 0 && currentAttacker == null)
+                {
+                    StartCoroutine(EndBattle(2));
+                }
+                else if (defenderQueue.Count == 0 && currentDefender == null)
+                {
+                    StartCoroutine(EndBattle(1));
+                }
+                else
+                {
+                    StartCoroutine(NextRound());
+                }
                 counter = 0;
             }
             else
@@ -63,17 +78,20 @@ public class BattleManager : MonoBehaviour
         CameraManager.HideAll();
         CameraManager.ShowBattleCamera(true);
         battleManager.NextRound();
+        battleManager.battlers[0].gameObject.SetActive(false);
+        battleManager.battlers[1].gameObject.SetActive(false);
     }
 
     private IEnumerator EndBattle(int flag)
     {
+        int waitTime = 5;
         switch (flag)
         {
             case 3:
                 // Tie.
-                battleMessage.text = defender.player.playerName + " won " + defenderKills + " Gold!";
+                battleMessage.text = "No one won!";
+                yield return new WaitForSeconds(waitTime);
                 BattleCleanup();
-                yield return new WaitForSeconds(2);
                 Show(false);
                 break;
             case 2:
@@ -82,9 +100,13 @@ public class BattleManager : MonoBehaviour
                 {
                     CardGameManager.localPlayer.AddGold(defenderKills);
                 }
-                battleMessage.text = defender.player.playerName + " won " + defenderKills + " Gold!";
+                else
+                {
+                    CardGameManager.cardGameManager.gamePlayers[defender.player.id].AddGold(defenderKills);
+                }
+                battleMessage.text = defender.player.playerName + " won " + defenderKills * 10 + " Gold!";
+                yield return new WaitForSeconds(waitTime);
                 BattleCleanup();
-                yield return new WaitForSeconds(2);
                 Show(false);
                 break;
             case 1:
@@ -93,9 +115,13 @@ public class BattleManager : MonoBehaviour
                 {
                     CardGameManager.localPlayer.AddGold(attackerKills);
                 }
-                battleMessage.text = attacker.player.playerName + " won " + attackerKills + " Gold!";
+                else
+                {
+                    CardGameManager.cardGameManager.gamePlayers[attacker.player.id].AddGold(attackerKills);
+                }
+                battleMessage.text = attacker.player.playerName + " won " + attackerKills * 10 + " Gold!";
+                yield return new WaitForSeconds(waitTime);
                 BattleCleanup();
-                yield return new WaitForSeconds(2);
                 Show(false);
                 break;
             default:
@@ -197,7 +223,7 @@ public class BattleManager : MonoBehaviour
                 battlers[1].GetComponent<Animator>().Play(currentDefender.ToString());
                 battlers[0].gameObject.SetActive(false);
                 defenderKills++;
-                attackerPower -= currentAttacker.tier;
+                attackerPower -= currentAttacker.tier + 1;
                 currentAttacker = null;
                 battleMessage.text = currentDefender.GetName() + " wins!";
                 break;
@@ -256,7 +282,7 @@ public class BattleManager : MonoBehaviour
                 }
 
                 battlers[1].gameObject.SetActive(false);
-                defenderPower -= currentDefender.tier;
+                defenderPower -= currentDefender.tier + 1;
                 attackerKills++;
                 currentDefender = null;
 
@@ -267,7 +293,7 @@ public class BattleManager : MonoBehaviour
                 battlers[1].GetComponent<Animator>().Play(currentDefender.ToString());
                 battlers[0].GetComponent<Animator>().Play(currentAttacker.ToString());
 
-                attackerPower -= currentAttacker.tier;
+                attackerPower -= currentAttacker.tier + 1;
                 battlers[0].gameObject.SetActive(false);
                 defenderKills++;
                 currentAttacker = null;
@@ -293,30 +319,14 @@ public class BattleManager : MonoBehaviour
                 battlers[0].GetComponent<Animator>().Play(attacker.ToString());
                 battlers[1].gameObject.SetActive(false);
                 attackerKills++;
-                defenderPower -= currentDefender.tier;
+                defenderPower -= currentDefender.tier + 1;
                 currentDefender = null;
                 battleMessage.text = currentAttacker.GetName() + " wins!";
                 break;
         }
 
-        yield return new WaitForSeconds(2f);
-
-        if (attackerQueue.Count == 0 && defenderQueue.Count == 0)
-        {
-            StartCoroutine(EndBattle(3));
-        }
-        else if (attackerQueue.Count == 0)
-        {
-            StartCoroutine(EndBattle(2));
-        }
-        else if (defenderQueue.Count == 0)
-        {
-            StartCoroutine(EndBattle(1));
-        }
-        else
-        {
-            StartCoroutine(EndBattle(0));
-        }
+        battlerUis[0].UpdatePower(attackerPower);
+        battlerUis[1].UpdatePower(defenderPower);
     }
 
     private void UpdateUnits()
@@ -332,12 +342,16 @@ public class BattleManager : MonoBehaviour
             if (attacker.player.id == id && attackerQueue.Count > 0)
             {
                 unitQueue = attackerQueue;
-                unitQueue.Enqueue(currentAttacker);
+
+                if (currentAttacker != null)
+                    unitQueue.Enqueue(currentAttacker);
             }
             else if (defender.player.id == id && defenderQueue.Count > 0)
             {
                 unitQueue = defenderQueue;
-                unitQueue.Enqueue(currentDefender);
+
+                if (currentDefender != null)
+                    unitQueue.Enqueue(currentDefender);
             }
 
             print(unitQueue.Count);
@@ -346,6 +360,7 @@ public class BattleManager : MonoBehaviour
             {
                 print("hello");
                 Unit unit = unitQueue.Dequeue();
+                print(unit);
                 newUM[unit.type][unit.tier]++;
                 units.Add(unit.type + "_" + unit.tier); 
             }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ServerManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class ServerManager : MonoBehaviour
     public string form;
     public int lobbyIndex = 0;
     public bool localGame = false;
+    public Button[] buttons;
 
     private bool pinging = false;
     private float pingCounter;
@@ -23,7 +25,7 @@ public class ServerManager : MonoBehaviour
     void Start()
     {
         serverManager = this;
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -32,6 +34,14 @@ public class ServerManager : MonoBehaviour
         if (pinging)
         {
             pingCounter++;
+        }
+    }
+
+    private void TurnOffButtons()
+    {
+        foreach (Button button in buttons)
+        {
+            button.interactable = false;
         }
     }
 
@@ -60,6 +70,7 @@ public class ServerManager : MonoBehaviour
     }
 
     public void CreateLobby() {
+        TurnOffButtons();
         LobbyManager.lobby = new Lobby();
         LobbyManager.lobby.AddPlayer(PlayerWrapper.player);
         StartCoroutine(SendToServer("CreateLobby " + LobbyManager.lobby.ToString(), CreateLobbyCallback));
@@ -94,6 +105,7 @@ public class ServerManager : MonoBehaviour
                 for (int i = 0; i < lobbySplit.Length; i++)
                 {
                     Lobby newLobby = Lobby.FromString(ps_to_map(lobbySplit[i]));
+                    print(newLobby);
                     LobbyList.lobbyList.lobbyNames[i].lobby = newLobby;
                     LobbyList.lobbyList.lobbyNames[i].UpdateText();
                 }
@@ -169,7 +181,8 @@ public class ServerManager : MonoBehaviour
         if (localGame)
             www = UnityWebRequest.Post("http://127.0.0.1:5000/save", formData);
         else
-            www = UnityWebRequest.Post("https://hexeagle-server.herokuapp.com/save", formData);
+            //www = UnityWebRequest.Post("https://hexeagle-server.herokuapp.com/save", formData);
+            www = UnityWebRequest.Post("http://127.0.0.1:5000/save", formData);
         www.SetRequestHeader("Content-Type", "application/json");
         yield return www.SendWebRequest();
 

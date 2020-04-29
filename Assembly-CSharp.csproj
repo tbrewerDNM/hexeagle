@@ -62,7 +62,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\CloseGame.cs" />
     <Compile Include="Assets\Scripts\AssetManager.cs" />
     <Compile Include="Assets\Scripts\BattleManager.cs" />
     <Compile Include="Assets\Scripts\BattlerUI.cs" />
@@ -70,7 +69,9 @@
     <Compile Include="Assets\Scripts\BuildingWindow.cs" />
     <Compile Include="Assets\Scripts\CameraManager.cs" />
     <Compile Include="Assets\Scripts\CardGameManager.cs" />
+    <Compile Include="Assets\Scripts\CloseGame.cs" />
     <Compile Include="Assets\Scripts\GamePlayer.cs" />
+    <Compile Include="Assets\Scripts\HelpMenu.cs" />
     <Compile Include="Assets\Scripts\Lobby.cs" />
     <Compile Include="Assets\Scripts\LobbyList.cs" />
     <Compile Include="Assets\Scripts\LobbyManager.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Assets\Scripts\SceneManagement.cs" />
     <Compile Include="Assets\Scripts\ServerManager.cs" />
     <Compile Include="Assets\Scripts\Shop.cs" />
+    <Compile Include="Assets\Scripts\Test.cs" />
     <Compile Include="Assets\Scripts\TitleManager.cs" />
     <Compile Include="Assets\Scripts\TradeRequest.cs" />
     <Compile Include="Assets\Scripts\TradeUI.cs" />

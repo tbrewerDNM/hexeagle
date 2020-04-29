@@ -20,7 +20,7 @@ public class TradeWindow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void Show(bool show)
@@ -53,6 +53,12 @@ public class TradeWindow : MonoBehaviour
                 button.interactable = true;
             }
         }
+
+        if (tradeRequest.empty())
+        {
+            buttons[1].interactable = false;
+            buttons[2].interactable = false;
+        }
     }
 
     public void Init()
@@ -67,10 +73,28 @@ public class TradeWindow : MonoBehaviour
     {
         if (CardGameManager.localPlayer.CanAfford(tradeRequest.inResources))
         {
+            // First reset any trade that was there.
+            StartCoroutine(ServerManager.serverManager.SendToServer("ResetTrade SESSIONID=" + LobbyManager.lobby.GetId() + "&pid1=" + CardGameManager.localPlayer.player.id + "&pid2=" + currentTrader.id, null));
+
             // Set next turn to the next player.
             tradeRequest.turn = currentTrader.id;
-            StartCoroutine(ServerManager.serverManager.SendToServer("TradeRequest SESSIONID=" + LobbyManager.lobby.GetId() + "&id=" + CardGameManager.localPlayer.player.id + "&" + tradeRequest.ToString(), null));
+            StartCoroutine(ServerManager.serverManager.SendToServer("TradeRequest SESSIONID=" + LobbyManager.lobby.GetId() + "&id=" + CardGameManager.localPlayer.player.id + "&" + tradeRequest.ToString(), SendTradeCallback));
             Show(CardGameManager.cardGameManager.gamePlayers[currentTrader.id]);
+        }
+    }
+
+    private void SendTradeCallback()
+    {
+        switch (ServerManager.serverManager.status)
+        {
+            /* success case */
+            case 0:
+                break;
+            /* fail case */
+            case -1:
+                // Resend on fail.
+                SendTrade();
+                break;
         }
     }
 
@@ -113,24 +137,50 @@ public class TradeWindow : MonoBehaviour
                 CardGameManager.localPlayer.resourceBuffer = tradeRequest.inResources;
                 CardGameManager.localPlayer.Purchase(tradeRequest.inResources);
 
+                tradeUis[0].EnableAll(false);
+                tradeUis[1].EnableAll(false);
+
                 // If the other party has already accepted, give the resources locally.
                 if (tradeRequest.accept1 + tradeRequest.accept2 == 4)
                 {
                     print("obtained acc1");
-                    TradeRequest.PrintMatrix(tradeRequest.inResources);
-                    TradeRequest.PrintMatrix(tradeRequest.outResources);
-                    TradeRequest.PrintMatrix(CardGameManager.localPlayer.GetResourceMatrix());
                     CardGameManager.localPlayer.Obtain(tradeRequest.outResources);
-                    TradeRequest.PrintMatrix(CardGameManager.localPlayer.GetResourceMatrix());
                     tradeRequest.Reset();
+                    tradeUis[0].EnableAll(true);
+                    tradeUis[1].EnableAll(true);
                 }
 
                 // Send response to server.
                 StartCoroutine(ServerManager.serverManager.SendToServer("RespondRequest SESSIONID=" + LobbyManager.lobby.GetId() + "&" + tradeRequest.ToString() + "&id=" + CardGameManager.localPlayer.player.id + "&response=2", null));
-                
+
                 // Update the UI.
                 Show(CardGameManager.cardGameManager.gamePlayers[tradeRequest.pid]);
             }
+            else
+            {
+                print("Cant afford");
+            }
+        }
+        else
+        {
+            print("Not your turn!");
+        }
+    }
+
+    public void Decline()
+    {
+        print("Decline");
+        if (CardGameManager.localPlayer.player.id == tradeRequest.turn)
+        {
+            print("yes");
+            tradeRequest.accept1 = 1;
+            tradeRequest.turn = currentTrader.id;
+            // Send response to server.
+            StartCoroutine(ServerManager.serverManager.SendToServer("RespondRequest SESSIONID=" + LobbyManager.lobby.GetId() + "&" + tradeRequest.ToString() + "&id=" + CardGameManager.localPlayer.player.id + "&response=1", null));
+            tradeRequest.Reset();
+            tradeUis[0].EnableAll(true);
+            tradeUis[1].EnableAll(true);
+            Show(CardGameManager.cardGameManager.gamePlayers[tradeRequest.pid]);
         }
     }
 }

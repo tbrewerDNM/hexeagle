@@ -5,7 +5,10 @@ using UnityEngine.UI;
 
 public class PlayerHUD : MonoBehaviour
 {
+    public static bool requestSent = false;
+
     public Text playerName;
+    public Image playerBg;
     public Image playerImage;
     public int index;
     // Index 0 is battle, index 1 is trade.
@@ -36,6 +39,7 @@ public class PlayerHUD : MonoBehaviour
         player = p;
         playerName.text = p.playerName;
         playerImage.sprite = AssetManager.assetManager.raceFaces[(int)p.race];
+        playerBg.sprite = AssetManager.assetManager.colorBgs[p.id];
     }
 
     public void OpenTrade()
@@ -49,9 +53,20 @@ public class PlayerHUD : MonoBehaviour
         {
             hud.buttons[0].interactable = false;
         }
-        StartCoroutine(ServerManager.serverManager.SendToServer("StartBattle SESSIONID=" + LobbyManager.lobby.GetId() 
-                                                                                         + "&atk=" + CardGameManager.localPlayer.player.id 
-                                                                                         + "&def=" + index
-                                                                                         + "&time=" + System.DateTime.UtcNow.AddSeconds(30).ToString().Replace(' ', '-'), null));
+
+        if (!ServerManager.serverManager.localGame)
+        {
+            requestSent = true;
+            StartCoroutine(ServerManager.serverManager.SendToServer("StartBattle SESSIONID=" + LobbyManager.lobby.GetId()
+                                                                                             + "&atk=" + CardGameManager.localPlayer.player.id
+                                                                                             + "&def=" + index
+                                                                                             + "&time=" + System.DateTime.UtcNow.AddSeconds(30).ToString().Replace(' ', '-'), null));
+        }
+        else
+        {
+            BattleManager.battleManager.InitBattle(CardGameManager.localPlayer, CardGameManager.cardGameManager.gamePlayers[index]);
+            BattleManager.StartBattle();
+            CardGameManager.inCombat = true;
+        }
     }
 }

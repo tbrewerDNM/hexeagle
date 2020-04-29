@@ -13,6 +13,7 @@ public class LobbyManager : MonoBehaviour
     public LobbyPlayer[] lobbyPlayers;
     public Text countdown;
     public Button startButton;
+    public Button leaveButton;
 
     private int i = 0;
     private bool showCountdown = false;
@@ -32,9 +33,9 @@ public class LobbyManager : MonoBehaviour
 
         if (ServerManager.serverManager.localGame)
         {
-            LobbySelect.AddBot(new Player("Elf" + "-1|1-1-1-1-0-0-0"));
-            LobbySelect.AddBot(new Player("Dwarf" + "-2|1-1-1-1-0-0-0"));
-            LobbySelect.AddBot(new Player("Lizard" + "-3|1-1-1-1-0-0-0"));
+            LobbySelect.AddBot(new Player("Elf-" + Lobby.GenerateRandomString(16) + "-1|1-1-1-1-0-0-0"));
+            LobbySelect.AddBot(new Player("Dwarf-" + Lobby.GenerateRandomString(16) + "-2|1-1-1-1-0-0-0"));
+            LobbySelect.AddBot(new Player("Lizard-" + Lobby.GenerateRandomString(16) + "-3|1-1-1-1-0-0-0"));
         }
 
         UpdatePlayers();
@@ -47,6 +48,7 @@ public class LobbyManager : MonoBehaviour
         int cd = 100;
 
         if (showCountdown) {
+            leaveButton.interactable = false;
             cd = Mathf.FloorToInt(((startTime.Ticks - currentTime.Ticks) / 6000000));
             countdown.text = "Game starting in " + cd;
 
@@ -96,6 +98,7 @@ public class LobbyManager : MonoBehaviour
 
     public void StartLobby() {
         startButton.interactable = false;
+        leaveButton.interactable = false;
         StartCoroutine(ServerManager.serverManager.SendToServer("StartLobby SESSIONID=" + LobbyManager.lobby.GetId() + "&time=" + System.DateTime.UtcNow.AddSeconds(10).ToString().Replace(' ', '-'), StartLobbyCallback));
     }
 
@@ -119,6 +122,7 @@ public class LobbyManager : MonoBehaviour
                 lobbyPlayers[i].player = LobbyManager.lobby.Get(i);
                 lobbyPlayers[i].UpdateText();
                 lobbyPlayers[i].raceImage.sprite = AssetManager.assetManager.raceFaces[(int)lobbyPlayers[i].player.race];
+                lobbyPlayers[i].raceBg.sprite = AssetManager.assetManager.colorBgs[i];
                 lobbyPlayers[i].raceText.text = lobbyPlayers[i].player.race.ToString();
             }
             else

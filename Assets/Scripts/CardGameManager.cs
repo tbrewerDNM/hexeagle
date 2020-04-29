@@ -178,6 +178,7 @@ public class CardGameManager : MonoBehaviour
 
                 if (ServerManager.serverManager.form != "" && !inCountdown)
                 {
+                    PlayerHUD.requestSent = false;
                     ps = ServerManager.ps_to_map(ServerManager.serverManager.form);
 
                     int id1 = System.Int32.Parse(ps["atk"]);
@@ -196,12 +197,23 @@ public class CardGameManager : MonoBehaviour
 
                     inCountdown = true;
                 }
+                else if (ServerManager.serverManager.form == "" && PlayerHUD.requestSent)
+                {
+                    playerHuds[localPlayer.player.id].StartBattle();
+                }
 
                 break;
             /* fail case */
             case -1:
                 break;
         }
+    }
+
+    private void Swap(in int value1, in int value2, out int val1, out int val2)
+    {
+        int tmp = value1;
+        val1 = value2;
+        val2 = tmp;
     }
 
     protected void UpdateTradeCallback()
@@ -226,37 +238,48 @@ public class CardGameManager : MonoBehaviour
                         int id2 = System.Int32.Parse(ps["pid2"]);
                         int accept1 = System.Int32.Parse(ps["accept1"]);
                         int accept2 = System.Int32.Parse(ps["accept2"]);
+
+                        if (id2 == localPlayer.player.id)
+                        {
+                            Swap(id1, id2, out id1, out id2);
+                            Swap(accept1, accept2, out accept1, out accept2);
+                        }
+
                         int turn = System.Int32.Parse(ps["turn"]);
 
                         // Poll once if turn is different.
                         if (turn != gamePlayers[id2].currentRequest.turn && id1 != id2 && !gamePlayers[id2].currentRequest.isReset)
                         {
-                            //gamePlayers[id1].currentRequest.turn = turn;
                             gamePlayers[id2].currentRequest.turn = turn;
-                            print(id1);
-                            print(id2);
-                            //gamePlayers[id1].currentRequest.UpdateTradeRequest(ps, id1);
-                            print(gamePlayers[id2].currentRequest);
                             gamePlayers[id2].currentRequest.UpdateTradeRequest(ps, id2);
 
                             print(gamePlayers[id2].currentRequest);
 
-                            if (id1 == localPlayer.player.id)
-                            {
-                                // Hack way to update trade menu if it is still open.
-                            //    bool open = tradeMenu.gameObject.activeSelf;
-                                tradeMenu.Show(gamePlayers[id2]);
-                               // tradeMenu.Show(open);
-                            }
-                            else
-                            {
-                               // bool open = tradeMenu.gameObject.activeSelf;
-                                tradeMenu.Show(gamePlayers[id1]);
-                                //tradeMenu.Show(open);
-                            }
+                            tradeMenu.Show(gamePlayers[id2]);
                         }
 
                         print(accept1 + accept2);
+
+                        print(gamePlayers[id2].currentRequest.isReset);
+
+                        if (accept1 > 0 || accept1 > 0)
+                        {
+                            tradeMenu.tradeUis[0].EnableAll(false);
+                            tradeMenu.tradeUis[1].EnableAll(false);
+                        }
+
+                        // Cannot change values if either party has accepted the deal.
+                        if ((accept1 == 1 || accept2 == 1) && !gamePlayers[id2].currentRequest.empty())
+                        {
+                            print("this cancer");
+                            gamePlayers[id2].currentRequest.Reset();
+                            tradeMenu.Init();
+                            tradeMenu.Show(false);
+                            tradeMenu.tradeUis[0].EnableAll(true);
+                            tradeMenu.tradeUis[1].EnableAll(true);
+                            StartCoroutine(ServerManager.serverManager.SendToServer("ResetTrade SESSIONID=" + LobbyManager.lobby.GetId() + "&pid1=" + id1 + "&pid2=" + id2, null));
+                            return;
+                        }
 
                         // If both parties accept, give each their respected resources.
                         // Then reset request.
@@ -267,18 +290,18 @@ public class CardGameManager : MonoBehaviour
 
                             if (!gamePlayers[id2].currentRequest.isReset)
                             {
-                                print("Obtained");
-                                TradeRequest.PrintMatrix(gamePlayers[id2].currentRequest.inResources);
-                                TradeRequest.PrintMatrix(gamePlayers[id2].currentRequest.outResources);
                                 localPlayer.Obtain(gamePlayers[id2].currentRequest.outResources);
                                 gamePlayers[id2].currentRequest.Reset();
                                 tradeMenu.Init();
                                 tradeMenu.Show(false);
+                                tradeMenu.tradeUis[0].EnableAll(true);
+                                tradeMenu.tradeUis[1].EnableAll(true);
                                 StartCoroutine(ServerManager.serverManager.SendToServer("ResetTrade SESSIONID=" + LobbyManager.lobby.GetId() + "&pid1=" + id1 + "&pid2=" + id2, null));
                             }
                         }
-                        else
+                        else if (!gamePlayers[id2].currentRequest.empty())
                         {
+                            print("found the cancer");
                             // Poll only if it is the other player's turn.
                             if ((id1 == localPlayer.player.id && turn == id2) || (id2 == localPlayer.player.id && turn == id1))
                             {

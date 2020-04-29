@@ -6,6 +6,7 @@ public class Player
 {
     public string playerName;
     public int id = 0;
+    private string hiddenId;
     public PlayerRace race = PlayerRace.HUMAN;
     public int[] buildingTiers { get; set; }
     public List<string> unitTiers = new List<string>();
@@ -13,8 +14,9 @@ public class Player
     public Player(string paramstr) {
         buildingTiers = new int[7];
         string[] parameters = paramstr.Split('|');
-        this.playerName = parameters[0].Split('-')[0];
-        this.race = (PlayerRace)System.Int32.Parse(parameters[0].Split('-')[1]);
+        playerName = parameters[0].Split('-')[0];
+        hiddenId = parameters[0].Split('-')[1];
+        race = (PlayerRace)System.Int32.Parse(parameters[0].Split('-')[2]);
 
         string[] bts = parameters[1].Split('-');
 
@@ -37,7 +39,7 @@ public class Player
 
     // serialize this object
     public override string ToString() {
-        string output = playerName + "-" + (int)race + "|";
+        string output = playerName + "-" + hiddenId + "-" + (int)race + "|";
 
         for (int i = 0; i < 7; i++)
         {

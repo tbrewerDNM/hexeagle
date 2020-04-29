@@ -11,6 +11,7 @@ public class BuildingWindow : MonoBehaviour
     public Text dispDesc;
     public Image dispImage;
     public Text[] dispCost;
+    public Button upgradeButton;
 
     private Building building;
 
@@ -38,8 +39,16 @@ public class BuildingWindow : MonoBehaviour
     private void UpdateCosts()
     {
         dispName.text = building.buildingName + " Tier " + building.tier;
+        upgradeButton.interactable = true;
 
         int[] cost = Shop.GetCost(building);
+
+        if (cost[0] < 0)
+        {
+            cost = Shop.GetCost((int)building.type, 2);
+            upgradeButton.interactable = false;
+        }
+
         for (int i = 0; i < 4; i++)
         {
             dispCost[i].text = "" + (cost[i] * 10);
