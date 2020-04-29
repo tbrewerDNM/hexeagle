@@ -25,3 +25,6 @@ Members: Steven Aque, Branden Baca, Terence Brewer, Wesley Camphouse
 <ol>
 <li>Multiplayer works with the heroku link, but it is very buggy</li>
 </ol>
+
+### Current State 0f the Game
+The game is techincally finished, however it is very buggy and can crash at a moments notice. The multiplayer aspect is much buggier than the single player, but the game is playable.
