@@ -71,16 +71,21 @@ public class TradeWindow : MonoBehaviour
 
     public void SendTrade()
     {
+        print("send trade");
         if (CardGameManager.localPlayer.CanAfford(tradeRequest.inResources))
         {
+            print("sent successfully");
             // First reset any trade that was there.
             StartCoroutine(ServerManager.serverManager.SendToServer("ResetTrade SESSIONID=" + LobbyManager.lobby.GetId() + "&pid1=" + CardGameManager.localPlayer.player.id + "&pid2=" + currentTrader.id, null));
 
             // Set next turn to the next player.
             tradeRequest.turn = currentTrader.id;
+            tradeRequest.isReset = false;
             StartCoroutine(ServerManager.serverManager.SendToServer("TradeRequest SESSIONID=" + LobbyManager.lobby.GetId() + "&id=" + CardGameManager.localPlayer.player.id + "&" + tradeRequest.ToString(), SendTradeCallback));
             Show(CardGameManager.cardGameManager.gamePlayers[currentTrader.id]);
+            return;
         }
+        print("Cant afford");
     }
 
     private void SendTradeCallback()
@@ -130,6 +135,7 @@ public class TradeWindow : MonoBehaviour
             {
                 tradeRequest.accept1 = 2;
                 tradeRequest.turn = currentTrader.id;
+                tradeRequest.isReset = true;
                 print("Player has accepted the request!");
                 print(tradeRequest);
 
@@ -175,6 +181,7 @@ public class TradeWindow : MonoBehaviour
             print("yes");
             tradeRequest.accept1 = 1;
             tradeRequest.turn = currentTrader.id;
+            tradeRequest.isReset = true;
             // Send response to server.
             StartCoroutine(ServerManager.serverManager.SendToServer("RespondRequest SESSIONID=" + LobbyManager.lobby.GetId() + "&" + tradeRequest.ToString() + "&id=" + CardGameManager.localPlayer.player.id + "&response=1", null));
             tradeRequest.Reset();

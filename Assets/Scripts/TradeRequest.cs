@@ -31,7 +31,6 @@ public class TradeRequest
         accept1 = 0;
         accept2 = 0;
         turn = -1;
-        isReset = true;
     }
 
     public bool empty()

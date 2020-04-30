@@ -136,8 +136,11 @@ public class BattleManager : MonoBehaviour
         UpdateUnits();
         CardGameManager.inCombat = false;
         CardGameManager.cardGameManager.countdownText.text = "";
+        battleMessage.text = "";
         CameraManager.ShowBattleCamera(false);
         CameraManager.cameraManager.SetActive(CardGameManager.localPlayer.player.id);
+        currentAttacker = null;
+        currentDefender = null;
     }
 
     public void InitBattle(GamePlayer player1, GamePlayer player2)

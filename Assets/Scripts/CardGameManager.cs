@@ -248,7 +248,7 @@ public class CardGameManager : MonoBehaviour
                         int turn = System.Int32.Parse(ps["turn"]);
 
                         // Poll once if turn is different.
-                        if (turn != gamePlayers[id2].currentRequest.turn && id1 != id2 && !gamePlayers[id2].currentRequest.isReset)
+                        if (turn != gamePlayers[id2].currentRequest.turn && id1 != id2)
                         {
                             gamePlayers[id2].currentRequest.turn = turn;
                             gamePlayers[id2].currentRequest.UpdateTradeRequest(ps, id2);
@@ -271,8 +271,8 @@ public class CardGameManager : MonoBehaviour
                         // Cannot change values if either party has accepted the deal.
                         if ((accept1 == 1 || accept2 == 1) && !gamePlayers[id2].currentRequest.empty())
                         {
-                            print("this cancer");
                             gamePlayers[id2].currentRequest.Reset();
+                            gamePlayers[id2].currentRequest.isReset = false;
                             tradeMenu.Init();
                             tradeMenu.Show(false);
                             tradeMenu.tradeUis[0].EnableAll(true);
@@ -288,7 +288,7 @@ public class CardGameManager : MonoBehaviour
                             print("Both parties have accepted the trade request!");
                             print(gamePlayers[id2].currentRequest);
 
-                            if (!gamePlayers[id2].currentRequest.isReset)
+                            if (!gamePlayers[id2].currentRequest.empty())
                             {
                                 localPlayer.Obtain(gamePlayers[id2].currentRequest.outResources);
                                 gamePlayers[id2].currentRequest.Reset();
@@ -298,8 +298,9 @@ public class CardGameManager : MonoBehaviour
                                 tradeMenu.tradeUis[1].EnableAll(true);
                                 StartCoroutine(ServerManager.serverManager.SendToServer("ResetTrade SESSIONID=" + LobbyManager.lobby.GetId() + "&pid1=" + id1 + "&pid2=" + id2, null));
                             }
+                            gamePlayers[id2].currentRequest.isReset = false;
                         }
-                        else if (!gamePlayers[id2].currentRequest.empty())
+                        else
                         {
                             print("found the cancer");
                             // Poll only if it is the other player's turn.
