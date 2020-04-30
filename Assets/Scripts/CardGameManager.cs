@@ -29,6 +29,9 @@ public class CardGameManager : MonoBehaviour
     void Awake() {
         cardGameManager = this;
 
+        FindObjectOfType<MusicPlayer>().GetComponent<AudioSource>().volume = 0.1f;
+        FindObjectOfType<MusicPlayer>().Play(0);
+
         for (int i = 0; i < LobbyManager.lobby.Count(); i++) {
 
             // Set local player to the player this runs on.
