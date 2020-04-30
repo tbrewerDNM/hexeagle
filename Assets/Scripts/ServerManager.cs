@@ -181,8 +181,8 @@ public class ServerManager : MonoBehaviour
         if (localGame)
             www = UnityWebRequest.Post("http://127.0.0.1:5000/save", formData);
         else
-            //www = UnityWebRequest.Post("https://hexeagle-server.herokuapp.com/save", formData);
-            www = UnityWebRequest.Post("http://127.0.0.1:5000/save", formData);
+            www = UnityWebRequest.Post("https://hexeagle-server.herokuapp.com/save", formData);
+            //www = UnityWebRequest.Post("http://127.0.0.1:5000/save", formData);
         www.SetRequestHeader("Content-Type", "application/json");
         yield return www.SendWebRequest();
 

@@ -37,7 +37,7 @@ public class BattleManager : MonoBehaviour
     {
         if (CardGameManager.inCombat)
         {
-            if (counter >= 240)
+            if (counter >= 180)
             {
                 if ((attackerQueue.Count == 0 && currentAttacker == null) && (defenderQueue.Count == 0 && currentDefender == null))
                 {
@@ -78,13 +78,14 @@ public class BattleManager : MonoBehaviour
         CameraManager.HideAll();
         CameraManager.ShowBattleCamera(true);
         battleManager.NextRound();
+        FindObjectOfType<MusicPlayer>().Play(1);
         battleManager.battlers[0].gameObject.SetActive(false);
         battleManager.battlers[1].gameObject.SetActive(false);
     }
 
     private IEnumerator EndBattle(int flag)
     {
-        int waitTime = 5;
+        int waitTime = 3;
         switch (flag)
         {
             case 3:
@@ -139,6 +140,7 @@ public class BattleManager : MonoBehaviour
         battleMessage.text = "";
         CameraManager.ShowBattleCamera(false);
         CameraManager.cameraManager.SetActive(CardGameManager.localPlayer.player.id);
+        FindObjectOfType<MusicPlayer>().Play(0);
         currentAttacker = null;
         currentDefender = null;
     }

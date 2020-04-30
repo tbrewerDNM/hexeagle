@@ -41,7 +41,11 @@ public class SceneManagement : MonoBehaviour
 
     public void OpenExitMenu()
     {
-        closeMenu = Instantiate(closeMenuPrefab, FindObjectOfType<Canvas>().transform);
+        foreach (Canvas canvas in FindObjectsOfType<Canvas>())
+        {
+            if (canvas.gameObject.tag == "MainCanvas")
+                closeMenu = Instantiate(closeMenuPrefab, canvas.transform);
+        }
     }
 
     public void CloseExitMenu()
